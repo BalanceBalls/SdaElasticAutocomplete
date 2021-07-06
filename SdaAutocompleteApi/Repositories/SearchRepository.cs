@@ -32,7 +32,6 @@ namespace SdaAutocompleteApi.Repositories
 			var propertiesIndexBoost = market is not null ? maxIndexBoost : minIndexBoost;
 			var mgmtIndexName = _elasticConfig.MgmtIndex;
 
-			//var marketTerm = market ?? "";
 			var results = await _elasticClient.SearchAsync<AutocompleteSearchResult>(x => x
 				.Query(query => query
 					.Bool(boolQuery => boolQuery
