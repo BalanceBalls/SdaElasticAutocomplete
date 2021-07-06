@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using SDAElasticAutoComplete.Exceptions;
 
 namespace SDAElasticAutoComplete.Extensions
 {
@@ -17,14 +16,7 @@ namespace SDAElasticAutoComplete.Extensions
 			using var streamReader = new StreamReader(fileStream);
 			using var jsonTextReader = new JsonTextReader(streamReader);
 
-			try
-			{
-				return serializer.Deserialize<T>(jsonTextReader);
-			}
-			catch (JsonSerializationException e)
-			{
-				throw new DataPreparationException(e.Message);
-			}
+			return serializer.Deserialize<T>(jsonTextReader);
 		}
 	}
 }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using SdaAutocompleteApi.Models;
 using SdaAutocompleteApi.Models.ViewModels;
 using SdaAutocompleteApi.Repositories;
 
@@ -12,29 +10,24 @@ namespace SdaAutocompleteApi.Services
 	{
 		private readonly ISearchRepository _searchRepository;
 
-		private readonly ElasticConfigOptions _elasticConfig;
-
-		public SearchService(ISearchRepository searchRepository, IOptions<ElasticConfigOptions> elasticConfig)
+		public SearchService(ISearchRepository searchRepository)
 		{
 			_searchRepository = searchRepository;
-			_elasticConfig = elasticConfig?.Value ?? throw new ArgumentNullException(nameof(elasticConfig));
 		}
 
-		public async Task<IEnumerable<AutocompleteSuggestion>> SearchForTermAsync(string term, string? market, int limit = 25)
+		public async Task<List<SearchSuggestion>> SearchForTermAsync(string term, string? market, int limit = 25)
 		{
-			const double minIndexBoost = 0.7;
-			const double maxIndexBoost = 1.5;
+			var suggestions = await _searchRepository.SearchForTermAsync(term, market, limit);
 
-			var searchConfig = new SearchConfig
+			var result = suggestions.Select(x => new SearchSuggestion
 			{
-				PropertiesIndexName = _elasticConfig.PropertiesIndex,
-				PropertiesIndexBoost = market is not null ? maxIndexBoost : minIndexBoost,
-				MgmtIndexName = _elasticConfig.MgmtIndex,
-				// if market is not defined - assume that term is related to mgmt
-				MgmtIndexBoost = market is null ? maxIndexBoost : minIndexBoost
-			};
+				Name = $"{(x.StreetAddress is null ? "Management: " : string.Empty)}{x.Name}",
+				FormerName = x.FormerName,
+				Market = x.Market,
+				City = x.City
+			}).ToList();
 
-			return await _searchRepository.SearchForTermAsync(term, market, searchConfig, limit);
+			return result;
 		}
 	}
 }

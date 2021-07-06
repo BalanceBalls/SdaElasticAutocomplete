@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SDAElasticAutoComplete.Models
+namespace SdaCommon.Models
 {
 	public record ElasticConfigOptions
 	{

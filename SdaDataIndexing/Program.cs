@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using SdaCommon.Models;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
 
@@ -22,7 +23,7 @@ namespace SDAElasticAutoComplete
 					configuration.Enrich.FromLogContext()
 						.WriteTo.Console()
 						.WriteTo.Elasticsearch(
-							new ElasticsearchSinkOptions(new Uri(context.Configuration["ElasticConfig:Endpoint"]))
+							new ElasticsearchSinkOptions(new Uri(context.Configuration[$"{ElasticConfigOptions.ElasticConfig}:Endpoint"]))
 							{
 								IndexFormat = $"{Assembly.GetEntryAssembly()!.GetName().Name}-logs-{DateTime.UtcNow:yyyy-MM-dd}",
 								AutoRegisterTemplate = true,
@@ -30,8 +31,9 @@ namespace SDAElasticAutoComplete
 								NumberOfReplicas = 1,
 								ModifyConnectionSettings = x => 
 									x.BasicAuthentication(
-										context.Configuration["ElasticConfig:UserName"], 
-										context.Configuration["ElasticConfig:Password"])
+										context.Configuration[$"{ElasticConfigOptions.ElasticConfig}:UserName"], 
+										context.Configuration[$"{ElasticConfigOptions.ElasticConfig}:Password"]
+									)
 							});
 				});
 	}

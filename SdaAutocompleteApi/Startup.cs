@@ -8,9 +8,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Nest;
 using SdaAutocompleteApi.Middlewares;
-using SdaAutocompleteApi.Models;
 using SdaAutocompleteApi.Repositories;
 using SdaAutocompleteApi.Services;
+using SdaCommon.Models;
 
 namespace SdaAutocompleteApi
 {

@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace SDAElasticAutoComplete.Middlewares
@@ -11,12 +10,9 @@ namespace SDAElasticAutoComplete.Middlewares
 	{
 		private readonly RequestDelegate _next;
 
-		private readonly ILogger<ExceptionHandlerMiddleware> _logger;
-
-		public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
+		public ExceptionHandlerMiddleware(RequestDelegate next)
 		{
 			_next = next;
-			_logger = logger;
 		}
 
 		public async Task Invoke(HttpContext context)
@@ -33,7 +29,6 @@ namespace SDAElasticAutoComplete.Middlewares
 
 		private async Task HandleExceptionAsync(HttpContext context, Exception exception)
 		{
-			_logger.LogError(exception, exception.StackTrace);
 			var response = context.Response;
 			const int statusCode = (int)HttpStatusCode.InternalServerError;
 			response.ContentType = "application/json";

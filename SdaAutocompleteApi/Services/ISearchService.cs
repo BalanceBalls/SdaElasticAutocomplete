@@ -6,6 +6,6 @@ namespace SdaAutocompleteApi.Services
 {
 	public interface ISearchService
 	{
-		Task<IEnumerable<AutocompleteSuggestion>> SearchForTermAsync(string term, string? market, int limit = 25);
+		Task<List<SearchSuggestion>> SearchForTermAsync(string term, string? market, int limit = 25);
 	}
 }

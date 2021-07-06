@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nest;
+using SdaCommon.Models;
 using SDAElasticAutoComplete.Exceptions;
-using SDAElasticAutoComplete.Models;
 using SDAElasticAutoComplete.Models.JsonModels;
 
 namespace SDAElasticAutoComplete.Repositories
@@ -51,6 +51,7 @@ namespace SDAElasticAutoComplete.Repositories
 		public async Task CreateManagementCompaniesIndexAsync()
 		{
 			const string analyzerName = "mgmt_analyzer";
+			const string searchAnalyzerName = "autocomplete_analyzer";
 			var indexName = _elasticConfig.MgmtIndex;
 			const int minGram = 2;
 			const int maxGram = 11;
@@ -83,6 +84,14 @@ namespace SDAElasticAutoComplete.Repositories
 										"edge_ngram_filter"
 									})
 								)
+								.Custom(searchAnalyzerName, autocompleteAnalyzer => autocompleteAnalyzer
+									.Tokenizer("standard")
+									.Filters(new []
+									{
+										"lowercase",
+										"stop",
+									})
+								)
 							)
 						)
 					)
@@ -91,14 +100,15 @@ namespace SDAElasticAutoComplete.Repositories
 							.Text(text => text
 								.Name(name => name.Name)
 								.Analyzer(analyzerName)
+								.SearchAnalyzer(searchAnalyzerName)
 							)
 							.Text(text => text
 								.Name(name => name.State)
 								.Analyzer(analyzerName)
+								.SearchAnalyzer(searchAnalyzerName)
 							)
-							.Text(text => text
+							.Keyword(text => text
 								.Name(name => name.Market)
-								.Analyzer("standard")
 							)
 							.Number(number => number
 								.Name(name => name.MgmtId)
@@ -108,13 +118,14 @@ namespace SDAElasticAutoComplete.Repositories
 				);
 
 				if (!result.IsValid)
-					throw new Exception("Failed to create index for management-companies");
+					throw new IndexCreationFailedException("Failed to create index for management-companies");
 			}
 		}
 
 		public async Task CreatePropertiesIndexAsync()
 		{
 			const string analyzerName = "property_analyzer";
+			const string searchAnalyzerName = "autocomplete_analyzer";
 			var indexName = _elasticConfig.PropertiesIndex;
 			const int minGram = 2;
 			const int maxGram = 11;
@@ -147,6 +158,14 @@ namespace SDAElasticAutoComplete.Repositories
 										"edge_ngram_filter"
 									})
 								)
+								.Custom(searchAnalyzerName, autocompleteAnalyzer => autocompleteAnalyzer
+									.Tokenizer("standard")
+									.Filters(new []
+									{
+										"lowercase",
+										"stop",
+									})
+								)
 							)
 						)
 					)
@@ -155,26 +174,30 @@ namespace SDAElasticAutoComplete.Repositories
 							.Text(text => text
 								.Name(name => name.Name)
 								.Analyzer(analyzerName)
+								.SearchAnalyzer(searchAnalyzerName)
 							)
 							.Text(text => text
 								.Name(name => name.FormerName)
 								.Analyzer(analyzerName)
+								.SearchAnalyzer(searchAnalyzerName)
 							)
 							.Text(text => text
 								.Name(name => name.StreetAddress)
 								.Analyzer(analyzerName)
+								.SearchAnalyzer(searchAnalyzerName)
 							)
 							.Text(text => text
 								.Name(name => name.State)
 								.Analyzer(analyzerName)
+								.SearchAnalyzer(searchAnalyzerName)
 							)
 							.Text(text => text
 								.Name(name => name.City)
 								.Analyzer(analyzerName)
+								.SearchAnalyzer(searchAnalyzerName)
 							)
-							.Text(text => text
+							.Keyword(text => text
 								.Name(name => name.Market)
-								.Analyzer("standard")
 							)
 							.Number(number => number
 								.Name(name => name.PropertyId)
@@ -184,7 +207,7 @@ namespace SDAElasticAutoComplete.Repositories
 				);
 
 				if (!result.IsValid)
-					throw new Exception("Failed to create index for properties");
+					throw new IndexCreationFailedException("Failed to create index for properties");
 			}
 		}
 	}
