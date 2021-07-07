@@ -39,11 +39,11 @@ namespace SdaAutocompleteApi.Repositories
 							.MultiMatch(multiMatch => multiMatch 
 								.Fields(fields => fields
 									// boost defined on how likely the term represents a field
-									.Field(field => field.Name, boost: 1.5)
-									.Field(field => field.StreetAddress, boost: 1.1)
-									.Field(field => field.FormerName, boost: 0.9)
-									.Field(field => field.City, 0.6)
-									.Field(field => field.State, 0.2)
+									.Field(field => field.Name, boost: 1.4)
+									.Field(field => field.StreetAddress, boost: 1.3)
+									.Field(field => field.FormerName, boost: 1.3)
+									.Field(field => field.City, 0.9)
+									.Field(field => field.State, 0.6)
 								)
 								.Fuzziness(Fuzziness.Auto)
 								.Query(term)
